@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
@@ -19,22 +19,22 @@ import java.math.BigDecimal;
 @Entity
 @Builder
 @Table(name = "drones")
-public class Drone {
+public class Drone implements Serializable {
     @Id
-    @Column(name="serial_number", length = 100)
-    private String serialNumber;
+    @Column(name="drone_serial_number", columnDefinition = "VARCHAR(100) NOT NULL")
+    private String droneSerialNumber;
 
-    @Column(name="model")
+    @Column(name="drone_model")
     @Enumerated(value = EnumType.STRING)
     private DroneModel droneModel;
 
-    @Column(name="weight")
+    @Column(name="drone_weight")
     @DecimalMax(value = "500", message =" More than {value} grams")
-    private Double weight;
+    private Double droneWeight;
 
-    @Column(name="battery_capacity")
+    @Column(name="drone_battery_capacity")
     @Max(value=100,message="More than 100%")
-    private BigDecimal batteryCapacity;
+    private BigDecimal droneBatteryCapacity;
 
     @Column(name = "drone_state")
     @Enumerated(value = EnumType.STRING)

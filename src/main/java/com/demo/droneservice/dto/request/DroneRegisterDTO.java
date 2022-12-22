@@ -16,20 +16,21 @@ import javax.validation.constraints.*;
 public class DroneRegisterDTO {
     @NotNull(message =" Serial Number must not be null")
     @NotBlank(message =" Serial Number must not be empty")
+    @Size(min=5,max=100,message="Serial number must not be greater than {value} characters")
     @JsonProperty(required = true)
-    private String serialNumber;
+    private String droneSerialNumber;
 
-    @NotNull(message =" Serial Number must not be null")
+    @NotNull(message =" Drone Model must not be null")
     @JsonProperty(required = true)
     private DroneModel droneModel;
 
     @DecimalMax(value = "500", message =" More than {value} grams")
     @JsonProperty(required = true)
-    private Double weight;
+    private Double droneWeight;
 
     @DecimalMax(value = "100" ,  message =" More than 100%")
     @JsonProperty(required = true)
-    private BigDecimal batteryCapacity;
+    private BigDecimal droneBatteryCapacity;
 
     @NotNull(message =" Serial Number must not be null")
     @JsonProperty(required = true)
