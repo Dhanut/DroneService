@@ -15,12 +15,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.demo.droneservice.util.DroneServiceConstants.*;
-import static com.demo.droneservice.util.DroneState.LOADED;
-import static com.demo.droneservice.util.DroneState.LOADING;
+import static com.demo.droneservice.util.DroneState.*;
 
 @Service
 @Slf4j
@@ -46,6 +44,7 @@ public class DroneServiceImpl implements DroneService{
                 build();
         droneRepository.save(droneModal);
         log.info("Creating Drone Item : {}",droneModal);
+        log.info("Response : {}",droneModal);
         log.info("Ending DroneServiceImpl -> registerDrone");
         return ResponseDTO.builder()
                 .status(OK)
@@ -55,54 +54,100 @@ public class DroneServiceImpl implements DroneService{
     }
 
     @Override
-    public ResponseDTO loadingDroneWithMedication(LoadDroneDTO loadDroneRequest) {
+    public ResponseDTO loadingDroneWithMedication(LoadDroneDTO loadDroneRequest){
         log.info("Starting DroneServiceImpl -> loadingDroneWithMedication");
+        ResponseDTO responseDTO;
 
-        createMedicationEntries(loadDroneRequest.getLoadingMedicationList());
-
-        //load can be performed if a drone in "LOADING" state only
-        //changeDroneStateToLoad(loadDroneRequest.getLoadingDroneSerialNumber());
+       // createMedicationEntries(loadDroneRequest.getLoadingMedicationList());
 
         Optional<Drone> drone = droneRepository.findByDroneSerialNumber(loadDroneRequest.getLoadingDroneSerialNumber());
-        Double totalWeight =getTotalMedicationWeight(loadDroneRequest.getLoadingMedicationList());
-        log.info("Total weight of medications : {}",totalWeight);
+        Double totalMedicationWeight =getTotalMedicationWeight(loadDroneRequest.getLoadingMedicationList());
+        log.info("Total weight of medications : {}",totalMedicationWeight);
 
         if( (drone.isPresent())) {
-            Double totalDroneWeight = totalWeight + drone.get().getDroneWeight();
-            if( (DRONE_MAX_WEIGHT >= totalDroneWeight) && (LOADING.name().equalsIgnoreCase(drone.get().getDroneState().name()))){
+            Double totalDroneWeight = totalMedicationWeight + drone.get().getDroneWeight();
+            log.info("Total weight of Drone with medications : {}",totalDroneWeight);
+            if( (DRONE_MAX_WEIGHT >= totalDroneWeight) &&
+                    ((LOADING.name().equalsIgnoreCase(drone.get().getDroneState().name()))
+                            || (IDLE.name().equalsIgnoreCase(drone.get().getDroneState().name()))) &&
+                    (BATTERY_CAPACITY_THRESHOLD < drone.get().getDroneBatteryCapacity())){
 
-                droneRepository.save(Drone.builder()
+                Drone loadedDrone = Drone.builder()
                         .droneSerialNumber(drone.get().getDroneSerialNumber())
-                        .droneState(LOADED).
-                        build());
-
-                List<Medication> medicationList=null;
-                ModelMapper modelMapper = new ModelMapper();
-                for(MedicationDTO medicationItem : loadDroneRequest.getLoadingMedicationList()){
-                    medicationList.add(modelMapper.map(medicationItem, Medication.class));
+                        .droneWeight(totalDroneWeight)
+                        .droneModel(drone.get().getDroneModel())
+                        .droneBatteryCapacity(drone.get().getDroneBatteryCapacity()).
+                        build();
+                if(DRONE_MAX_WEIGHT.equals(totalDroneWeight)){
+                    loadedDrone.setDroneState(LOADED);
+                }else{
+                    loadedDrone.setDroneState(LOADING);
                 }
+
+                droneRepository.save(loadedDrone);
+
+                List<Medication> medicationList = new ArrayList<>();
+                ModelMapper modelMapper = new ModelMapper();
+                loadDroneRequest.getLoadingMedicationList().forEach(medicationItem -> medicationList.add(modelMapper.map(medicationItem, Medication.class)));
+
 
                 loadDroneRepository.save(LoadDrone.builder()
                         .loadingDroneSerialNumber(drone.get().getDroneSerialNumber())
                         .loadingDeliveryAddress(loadDroneRequest.getLoadingDeliveryAddress())
                         .loadingMedicationList(medicationList)
                         .loadingTotalQuantity(loadDroneRequest.getLoadingTotalQuantity())
+                        .loadingDrone(loadedDrone)
                         .build());
 
-                return ResponseDTO.builder()
+                responseDTO= ResponseDTO.builder()
                         .status(OK)
                         .message(LOADED_SUCCESSFULLY)
                         .data(loadDroneRequest)
                         .build();
             }else{
-                log.info("error");
-                return null;
+                log.info("Preventing loading Drone with conditional checking");
+                throw  new RuntimeException(LOAD_DRONE_ERROR);
             }
 
         }else{
-            log.info("error");
-            return null;
+                log.info("No Drone found in the database");
+                throw new RuntimeException(NO_DATA_FOUND_IN_DB);
         }
+        log.info("Response : {}",responseDTO);
+        log.info("Ending DroneServiceImpl -> loadingDroneWithMedication");
+        return responseDTO;
+    }
+
+    @Override
+    public ResponseDTO checkingLoadedMedications(String droneSerialNumber) {
+        log.info("Starting DroneServiceImpl -> checkingLoadedMedications");
+        ResponseDTO responseDTO;
+        Optional<List<LoadDrone>> loadDrone = loadDroneRepository.findByLoadingDroneSerialNumber(droneSerialNumber);
+        if(loadDrone.isPresent()){
+            Set<Medication> set = new HashSet<Medication>();
+            loadDrone.get().forEach(i -> i.getLoadingMedicationList().forEach(m -> set.add(m)));
+            responseDTO= ResponseDTO.builder()
+                    .status(OK)
+                    .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY)
+                    .data(set)
+                    .build();
+        }else{
+            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+        }
+        log.info("Response : {}",responseDTO);
+        log.info("Ending DroneServiceImpl -> checkingLoadedMedications");
+        return responseDTO;
+    }
+
+    @Override
+    public ResponseDTO checkAvailableDrones() {
+        Optional<List<Drone>> drone = droneRepository.findAvailableDrones();
+        ResponseDTO responseDTO= ResponseDTO.builder()
+                .status(OK)
+                .message("AVAILABLE DRONES")
+                .data(drone)
+                .build();
+        return responseDTO;
     }
 
     private Double getTotalMedicationWeight(List<MedicationDTO> loadingMedicationList) {
@@ -110,9 +155,9 @@ public class DroneServiceImpl implements DroneService{
         for(MedicationDTO medicationItem : loadingMedicationList){
             Optional<Medication> response = medicationRepository.findByMedicationCode(medicationItem.getMedicationCode());
             if(!response.isPresent()){
-                log.error("NO record found");
+                throw new RuntimeException(NO_DATA_FOUND_IN_DB);
             }else{
-                totalWeight= totalWeight+response.get().getMedicationWeight();
+                totalWeight= totalWeight+medicationItem.getMedicationWeight();
             }
 
         }
@@ -131,7 +176,14 @@ public class DroneServiceImpl implements DroneService{
         }
     }
 
-   /** private void changeDroneStateToLoad(String loadingDroneSerialNumber) {
-        droneRepository.setUpdateState(LOADING,loadingDroneSerialNumber);
-    }**/
+    public void createMedications(MedicationDTO medicationItem){
+        medicationRepository.save(Medication
+                .builder()
+                .medicationCode(medicationItem.getMedicationCode())
+                .medicationName(medicationItem.getMedicationName())
+                .medicationWeight(medicationItem.getMedicationWeight())
+                .medicationImage(medicationItem.getMedicationImage())
+                .build());
+    }
+
 }

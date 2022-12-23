@@ -11,7 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
-import java.math.BigDecimal;
+
 
 @Data
 @NoArgsConstructor
@@ -34,7 +34,7 @@ public class Drone implements Serializable {
 
     @Column(name="drone_battery_capacity")
     @Max(value=100,message="More than 100%")
-    private BigDecimal droneBatteryCapacity;
+    private Integer droneBatteryCapacity;
 
     @Column(name = "drone_state")
     @Enumerated(value = EnumType.STRING)

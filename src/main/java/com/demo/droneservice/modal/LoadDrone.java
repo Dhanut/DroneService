@@ -1,6 +1,6 @@
 package com.demo.droneservice.modal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,23 +18,24 @@ import java.util.List;
 @Table(name = "load_drone")
 public class LoadDrone implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name="loading_id")
+    private Long loadingId;
 
-    @Id
-    @Column(name="loading_total_quantity", columnDefinition = "VARCHAR(100) NOT NULL")
+    @Column(name="loading_total_quantity")
     private Integer loadingTotalQuantity;
 
-    @Id
     @Column(name="loading_delivery_address", columnDefinition = "VARCHAR(100) NOT NULL")
     private String loadingDeliveryAddress;
 
-    @Id
     @Column(name="loading_drone_serialNumber", columnDefinition = "VARCHAR(100) NOT NULL")
     private String loadingDroneSerialNumber;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     private List<Medication> loadingMedicationList;
+
+    @OneToOne
+    @JoinColumn(name = "fk_drone_serial_number", referencedColumnName = "drone_serial_number")
+    private Drone loadingDrone;
 
 }

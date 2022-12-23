@@ -8,4 +8,7 @@ public interface DroneService {
 
     ResponseDTO registerDrone(DroneRegisterDTO droneRegisterRequest);
     ResponseDTO loadingDroneWithMedication(LoadDroneDTO loadDroneRequest);
+    ResponseDTO checkingLoadedMedications(String droneSerialNumber);
+
+    ResponseDTO checkAvailableDrones();
 }

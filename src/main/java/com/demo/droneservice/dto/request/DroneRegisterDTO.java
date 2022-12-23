@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+
 
 import javax.validation.constraints.*;
 
@@ -30,7 +30,7 @@ public class DroneRegisterDTO {
 
     @DecimalMax(value = "100" ,  message =" More than 100%")
     @JsonProperty(required = true)
-    private BigDecimal droneBatteryCapacity;
+    private Integer droneBatteryCapacity;
 
     @NotNull(message =" Serial Number must not be null")
     @JsonProperty(required = true)

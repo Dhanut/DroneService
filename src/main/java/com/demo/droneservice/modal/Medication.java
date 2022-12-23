@@ -17,6 +17,7 @@ import java.io.Serializable;
 @Builder
 @Table(name = "medications")
 public class Medication implements Serializable {
+
     @Id
     @Column(name="medication_code", columnDefinition = "VARCHAR(100) NOT NULL")
     private String medicationCode;
@@ -30,4 +31,5 @@ public class Medication implements Serializable {
 
     @Column(name="medication_image", columnDefinition = "VARCHAR(100) NOT NULL")
     private String medicationImage;
+
 }
