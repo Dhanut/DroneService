@@ -2,7 +2,6 @@ package com.demo.droneservice.controller;
 
 import com.demo.droneservice.dto.request.DroneRegisterDTO;
 import com.demo.droneservice.dto.request.LoadDroneDTO;
-import com.demo.droneservice.dto.request.MedicationDTO;
 import com.demo.droneservice.dto.response.ResponseDTO;
 import com.demo.droneservice.service.DroneServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -73,14 +72,6 @@ public class DroneController {
         ResponseDTO response = droneService.checkBatteryLevel(serialNumber);
         log.info("Ending DroneController -> checkBatteryLevel");
         return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-    @PostMapping(path="/load/create/medications", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<ResponseDTO> createMedicationEntries(
-            @Valid @NotNull @RequestBody MedicationDTO medicationDTO)  {
-
-         droneService.createMedications(medicationDTO);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
 }

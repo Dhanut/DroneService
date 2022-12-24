@@ -60,8 +60,6 @@ public class DroneServiceImpl implements DroneService{
     public ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest){
         log.info("Starting DroneServiceImpl -> loadingDroneWithMedication");
 
-       // createMedicationEntries(loadDroneRequest.getLoadingMedicationList());
-
         Optional<Drone> drone = droneRepository.findByDroneSerialNumber(loadDroneRequest.getLoadingDroneSerialNumber());
         Double totalMedicationWeight =getTotalMedicationWeight(loadDroneRequest.getLoadingMedicationList());
         log.info("Total weight of medications : {}",totalMedicationWeight);
@@ -190,28 +188,6 @@ public class DroneServiceImpl implements DroneService{
             }
         }
         return totalWeight;
-    }
-
-    private void createMedicationEntries(List<MedicationDTO> loadingMedicationList){
-        for(MedicationDTO medicationItem : loadingMedicationList){
-            medicationRepository.save(Medication
-                    .builder()
-                            .medicationCode(medicationItem.getMedicationCode())
-                            .medicationName(medicationItem.getMedicationName())
-                            .medicationWeight(medicationItem.getMedicationWeight())
-                            .medicationImage(medicationItem.getMedicationImage())
-                    .build());
-        }
-    }
-
-    public void createMedications(MedicationDTO medicationItem){
-        medicationRepository.save(Medication
-                .builder()
-                .medicationCode(medicationItem.getMedicationCode())
-                .medicationName(medicationItem.getMedicationName())
-                .medicationWeight(medicationItem.getMedicationWeight())
-                .medicationImage(medicationItem.getMedicationImage())
-                .build());
     }
 
 }
