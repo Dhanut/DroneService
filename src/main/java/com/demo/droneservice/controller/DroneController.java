@@ -34,29 +34,26 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     @PostMapping(path="/load", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Loading a Drone with medication")
-    public ResponseEntity<ResponseDTO> loadingDroneWithMedication(
+    public ResponseEntity<ResponseDTO> loadDroneWithMedication(
             @Valid @NotNull @RequestBody LoadDroneDTO loadDroneRequest)  {
-        log.info("Starting DroneController -> loadingDroneWithMedication");
-        ResponseDTO response = droneService.loadingDroneWithMedication(loadDroneRequest);
-        log.info("Ending DroneController -> loadingDroneWithMedication");
+        log.info("Starting DroneController -> loadDroneWithMedication");
+        ResponseDTO response = droneService.loadDroneWithMedication(loadDroneRequest);
+        log.info("Ending DroneController -> loadDroneWithMedication");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     @GetMapping(path="/check/medications/{serialNumber}", produces = "application/json")
     @Operation(summary = "Checking available medications for a given drone")
-    public ResponseEntity<ResponseDTO> checkingLoadedMedications(
+    public ResponseEntity<ResponseDTO> checkLoadedMedications(
             @PathVariable("serialNumber")String serialNumber)  {
-        log.info("Starting DroneController -> checkingLoadedMedications");
+        log.info("Starting DroneController -> checkLoadedMedications");
         log.info("Serial Number :{}",serialNumber);
-        ResponseDTO response = droneService.checkingLoadedMedications(serialNumber);
-        log.info("Ending DroneController -> checkingLoadedMedications");
+        ResponseDTO response = droneService.checkLoadedMedications(serialNumber);
+        log.info("Ending DroneController -> checkLoadedMedications");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
 
     @GetMapping(path="/check/available", produces = "application/json")
     @Operation(summary = "Checking available drones")
@@ -67,7 +64,16 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-
+    @GetMapping(path="/check/batteryLevel/{serialNumber}", produces = "application/json")
+    @Operation(summary = "Checking battery level for a given drone")
+    public ResponseEntity<ResponseDTO> checkBatteryLevel(
+            @PathVariable("serialNumber")String serialNumber)  {
+        log.info("Starting DroneController -> checkBatteryLevel");
+        log.info("Serial Number :{}",serialNumber);
+        ResponseDTO response = droneService.checkBatteryLevel(serialNumber);
+        log.info("Ending DroneController -> checkBatteryLevel");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
     @PostMapping(path="/load/create/medications", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ResponseDTO> createMedicationEntries(
             @Valid @NotNull @RequestBody MedicationDTO medicationDTO)  {

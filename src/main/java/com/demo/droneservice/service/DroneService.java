@@ -7,8 +7,8 @@ import com.demo.droneservice.dto.response.ResponseDTO;
 public interface DroneService {
 
     ResponseDTO registerDrone(DroneRegisterDTO droneRegisterRequest);
-    ResponseDTO loadingDroneWithMedication(LoadDroneDTO loadDroneRequest);
-    ResponseDTO checkingLoadedMedications(String droneSerialNumber);
-
+    ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest);
+    ResponseDTO checkLoadedMedications(String droneSerialNumber);
+    ResponseDTO checkBatteryLevel(String droneSerialNumber);
     ResponseDTO checkAvailableDrones();
 }

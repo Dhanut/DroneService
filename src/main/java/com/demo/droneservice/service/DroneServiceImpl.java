@@ -10,6 +10,7 @@ import com.demo.droneservice.modal.Medication;
 import com.demo.droneservice.repository.DroneRepository;
 import com.demo.droneservice.repository.LoadDroneRepository;
 import com.demo.droneservice.repository.MedicationRepository;
+import com.demo.droneservice.util.DroneState;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class DroneServiceImpl implements DroneService{
     MedicationRepository medicationRepository;
     @Autowired
     LoadDroneRepository loadDroneRepository;
+
+    ResponseDTO responseDTO;
 
     @Override
     public ResponseDTO registerDrone(DroneRegisterDTO droneRegisterRequest) {
@@ -54,9 +57,8 @@ public class DroneServiceImpl implements DroneService{
     }
 
     @Override
-    public ResponseDTO loadingDroneWithMedication(LoadDroneDTO loadDroneRequest){
+    public ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest){
         log.info("Starting DroneServiceImpl -> loadingDroneWithMedication");
-        ResponseDTO responseDTO;
 
        // createMedicationEntries(loadDroneRequest.getLoadingMedicationList());
 
@@ -119,9 +121,8 @@ public class DroneServiceImpl implements DroneService{
     }
 
     @Override
-    public ResponseDTO checkingLoadedMedications(String droneSerialNumber) {
+    public ResponseDTO checkLoadedMedications(String droneSerialNumber) {
         log.info("Starting DroneServiceImpl -> checkingLoadedMedications");
-        ResponseDTO responseDTO;
         Optional<List<LoadDrone>> loadDrone = loadDroneRepository.findByLoadingDroneSerialNumber(droneSerialNumber);
         if(loadDrone.isPresent()){
             Set<Medication> set = new HashSet<Medication>();
@@ -141,15 +142,43 @@ public class DroneServiceImpl implements DroneService{
 
     @Override
     public ResponseDTO checkAvailableDrones() {
-        Optional<List<Drone>> drone = droneRepository.findAvailableDrones();
-        ResponseDTO responseDTO= ResponseDTO.builder()
-                .status(OK)
-                .message("AVAILABLE DRONES")
-                .data(drone)
-                .build();
+        log.info("Starting DroneServiceImpl -> checkAvailableDrones");
+        List<DroneState> stateList = new ArrayList<>();
+        stateList.add(IDLE);
+        stateList.add(LOADING);
+
+        Optional<List<Drone>>  drones = droneRepository.findAllByDroneStateIn(stateList);
+        if(drones.isPresent()){
+            responseDTO= ResponseDTO.builder()
+                    .status(OK)
+                    .message(AVAILABLE_DRONES_FOR_LOADIND)
+                    .data(drones)
+                    .build();
+        }else{
+            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+        }
+        log.info("Response : {}",responseDTO);
+        log.info("Ending DroneServiceImpl -> checkAvailableDrones");
         return responseDTO;
     }
 
+    @Override
+    public ResponseDTO checkBatteryLevel(String droneSerialNumber) {
+        log.info("Starting DroneServiceImpl -> checkBatteryLevel");
+        Optional<Drone> drone = droneRepository.findByDroneSerialNumber(droneSerialNumber);
+        if(drone.isPresent()){
+            responseDTO= ResponseDTO.builder()
+                    .status(OK)
+                    .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY)
+                    .data(drone.get().getDroneBatteryCapacity())
+                    .build();
+        }else{
+            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+        }
+        log.info("Response : {}",responseDTO);
+        log.info("Ending DroneServiceImpl -> checkBatteryLevel");
+        return responseDTO;
+    }
     private Double getTotalMedicationWeight(List<MedicationDTO> loadingMedicationList) {
         Double totalWeight=0.00;
         for(MedicationDTO medicationItem : loadingMedicationList){
@@ -159,7 +188,6 @@ public class DroneServiceImpl implements DroneService{
             }else{
                 totalWeight= totalWeight+medicationItem.getMedicationWeight();
             }
-
         }
         return totalWeight;
     }
