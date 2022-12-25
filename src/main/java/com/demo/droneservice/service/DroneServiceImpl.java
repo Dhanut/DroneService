@@ -145,7 +145,7 @@ public class DroneServiceImpl implements DroneService{
             loadDrone.get().forEach(i -> i.getLoadingMedicationList().forEach(m -> set.add(m)));
             responseDTO= ResponseDTO.builder()
                     .status(OK)
-                    .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY)
+                    .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY+droneSerialNumber)
                     .data(set)
                     .build();
         }else{
@@ -193,7 +193,7 @@ public class DroneServiceImpl implements DroneService{
         if(drone.isPresent()){
             responseDTO= ResponseDTO.builder()
                     .status(OK)
-                    .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY)
+                    .message(CHECKED_BATTERY_LEVEL_SUCCESSFULLY+drone.get().getDroneSerialNumber())
                     .data(drone.get().getDroneBatteryCapacity())
                     .build();
         }else{
