@@ -35,6 +35,11 @@ public class DroneServiceImpl implements DroneService{
 
     ResponseDTO responseDTO;
 
+
+    /**Input - DroneRegisterDTO
+     * Register a new Drone in the database or even can use to update an existing drone attribute values
+     * Return - ResponseDTO
+     * **/
     @Override
     public ResponseDTO registerDrone(DroneRegisterDTO droneRegisterRequest) {
         log.info("Starting DroneServiceImpl -> registerDrone");
@@ -47,7 +52,7 @@ public class DroneServiceImpl implements DroneService{
                 build();
         droneRepository.save(droneModal);
         log.info("Creating Drone Item : {}",droneModal);
-        log.info("Response : {}",droneModal);
+        log.info("Response of registerDrone : {}",droneModal);
         log.info("Ending DroneServiceImpl -> registerDrone");
         return ResponseDTO.builder()
                 .status(OK)
@@ -56,6 +61,14 @@ public class DroneServiceImpl implements DroneService{
                 .build();
     }
 
+    /**Input - LoadDroneDTO
+     * Load medications to a Drone
+     * The Drone should be in IDLE or LOADING state only.
+     * And battery capacity should be more than 25% and Drone max weight can not exceed 500g.
+     * During loading if the Drone reached to 500g limit, state of drone should be updated to "LOADED" and can not load medication to this drone again.
+     * Same medication items can be loaded to a same drone many times if the Drone has not reached to 500g limit
+     * Return - ResponseDTO
+     * **/
     @Override
     public ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest){
         log.info("Starting DroneServiceImpl -> loadingDroneWithMedication");
@@ -113,17 +126,22 @@ public class DroneServiceImpl implements DroneService{
                 log.info("No Drone found in the database");
                 throw new RuntimeException(NO_DATA_FOUND_IN_DB);
         }
-        log.info("Response : {}",responseDTO);
+        log.info("Response of loadDroneWithMedication: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> loadingDroneWithMedication");
         return responseDTO;
     }
 
+    /**Input - droneSerialNumber
+     * Check loaded mediation for a given Drone (serial_number of Drone)
+     * Since there can be same medication item loaded many times to a same drone, here it will consider unique medication items for a given drone only.
+     * Return - ResponseDTO
+     * **/
     @Override
     public ResponseDTO checkLoadedMedications(String droneSerialNumber) {
         log.info("Starting DroneServiceImpl -> checkingLoadedMedications");
         Optional<List<LoadDrone>> loadDrone = loadDroneRepository.findByLoadingDroneSerialNumber(droneSerialNumber);
         if(loadDrone.isPresent()){
-            Set<Medication> set = new HashSet<Medication>();
+            Set<Medication> set = new HashSet<>();
             loadDrone.get().forEach(i -> i.getLoadingMedicationList().forEach(m -> set.add(m)));
             responseDTO= ResponseDTO.builder()
                     .status(OK)
@@ -133,11 +151,15 @@ public class DroneServiceImpl implements DroneService{
         }else{
             throw new RuntimeException(NO_DATA_FOUND_IN_DB);
         }
-        log.info("Response : {}",responseDTO);
+        log.info("Response of checkLoadedMedications: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkingLoadedMedications");
         return responseDTO;
     }
 
+    /**Input - NA
+     * Find all the drones in the database which are in State IDLE or LOADING only.
+     * Return - ResponseDTO
+     * **/
     @Override
     public ResponseDTO checkAvailableDrones() {
         log.info("Starting DroneServiceImpl -> checkAvailableDrones");
@@ -155,11 +177,15 @@ public class DroneServiceImpl implements DroneService{
         }else{
             throw new RuntimeException(NO_DATA_FOUND_IN_DB);
         }
-        log.info("Response : {}",responseDTO);
+        log.info("Response of checkAvailableDrones: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkAvailableDrones");
         return responseDTO;
     }
 
+    /**Input - droneSerialNumber
+     * Check the battery level of each drone in the database
+     * Return - ResponseDTO
+     * **/
     @Override
     public ResponseDTO checkBatteryLevel(String droneSerialNumber) {
         log.info("Starting DroneServiceImpl -> checkBatteryLevel");
@@ -173,10 +199,15 @@ public class DroneServiceImpl implements DroneService{
         }else{
             throw new RuntimeException(NO_DATA_FOUND_IN_DB);
         }
-        log.info("Response : {}",responseDTO);
+        log.info("Response of checkBatteryLevel: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkBatteryLevel");
         return responseDTO;
     }
+
+    /**Input - List of MedicationDTO
+     * Calculate the total weight of medication items
+     * Return - Total Weight
+     * **/
     private Double getTotalMedicationWeight(List<MedicationDTO> loadingMedicationList) {
         Double totalWeight=0.00;
         for(MedicationDTO medicationItem : loadingMedicationList){

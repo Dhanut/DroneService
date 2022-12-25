@@ -23,6 +23,12 @@ public class DroneController {
     @Autowired
     private DroneServiceImpl droneService;
 
+    /**
+     *End Point for Register a Drone
+     * POST method
+     * Request Body - DroneRegisterDTO
+     * Return - ResponseEntity<ResponseDTO>
+     * **/
     @PostMapping(path="/register", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Registering a Drone")
     public ResponseEntity<ResponseDTO> registerDrone(
@@ -33,6 +39,12 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     *End Point for load drone with medications
+     * POST method
+     * Request Body - LoadDroneDTO
+     * Return - ResponseEntity<ResponseDTO>
+     * **/
     @PostMapping(path="/load", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Loading a Drone with medication")
     public ResponseEntity<ResponseDTO> loadDroneWithMedication(
@@ -43,6 +55,12 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     *End Point for check loaded medications
+     * GET method
+     * Path param - drone_serial_number
+     * Return - ResponseEntity<ResponseDTO>
+     * **/
     @GetMapping(path="/check/medications/{serialNumber}", produces = "application/json")
     @Operation(summary = "Checking available medications for a given drone")
     public ResponseEntity<ResponseDTO> checkLoadedMedications(
@@ -54,6 +72,11 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     *End Point for check available drones ( Drones with IDLE and LOADING state)
+     * GET method
+     * Return - ResponseEntity<ResponseDTO>
+     * **/
     @GetMapping(path="/check/available", produces = "application/json")
     @Operation(summary = "Checking available drones")
     public ResponseEntity<ResponseDTO> checkAvailableDrones()  {
@@ -63,6 +86,12 @@ public class DroneController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     *End Point for check battery level of given drone
+     * GET method
+     * Path param - drone_serial_number
+     * Return - ResponseEntity<ResponseDTO>
+     * **/
     @GetMapping(path="/check/batteryLevel/{serialNumber}", produces = "application/json")
     @Operation(summary = "Checking battery level for a given drone")
     public ResponseEntity<ResponseDTO> checkBatteryLevel(

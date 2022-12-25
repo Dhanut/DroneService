@@ -23,7 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${API.URL}")
     private String apiUrl;
 
-
+    /**
+     *Authenticate End Points with given username, password and role
+     * **/
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication().withUser(user).password(password).roles(role);
@@ -37,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .httpBasic()
                 .and()
-                .headers().frameOptions().disable();;
+                .headers().frameOptions().disable();
     }
 
 

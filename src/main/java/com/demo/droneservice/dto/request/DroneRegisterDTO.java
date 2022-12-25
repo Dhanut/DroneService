@@ -4,6 +4,7 @@ import com.demo.droneservice.util.DroneModel;
 import com.demo.droneservice.util.DroneState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import javax.validation.constraints.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DroneRegisterDTO {
     @NotNull(message =" Serial Number must not be null")
     @NotBlank(message =" Serial Number must not be empty")

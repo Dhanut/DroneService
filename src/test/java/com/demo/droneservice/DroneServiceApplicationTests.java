@@ -1,13 +1,14 @@
 package com.demo.droneservice;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@SpringBootTest
-class DroneServiceApplicationTests {
+@RunWith(MockitoJUnitRunner.class)
+public class DroneServiceApplicationTests {
 
 	@Test
-	void contextLoads() {
+	public void contextLoads() {
 	}
 
 }

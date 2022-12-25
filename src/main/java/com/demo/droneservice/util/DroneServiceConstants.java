@@ -2,6 +2,7 @@ package com.demo.droneservice.util;
 
 public class DroneServiceConstants {
 
+    DroneServiceConstants(){}
     public static final String OK = "OK";
 
     public static final String AVAILABLE_DRONES_FOR_LOADIND = "Available Drones for Loading";
@@ -12,6 +13,5 @@ public class DroneServiceConstants {
     public static final String NO_DATA_FOUND_IN_DB = "No data found in database";
     public static final Double DRONE_MAX_WEIGHT = 500.00;
     public static final Integer BATTERY_CAPACITY_THRESHOLD = 25;
-
-    public static final String CHECKING_BATTERY_LEVEL = "Checking Battery Level";
+    public static final String FAILED ="failed";
 }

@@ -17,6 +17,9 @@ public class CheckBatteryLevel {
     @Autowired
     DroneRepository droneRepository;
 
+    /**
+     *Check and log the battery level of each drone in database periodically (at every 10000 millisecond)
+     * **/
     @Scheduled(fixedRate = 10000)
     public void checkBatteryLevel() {
         List<Drone> drones = droneRepository.findAll();
