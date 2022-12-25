@@ -88,6 +88,7 @@ All the end points in this project are authenticated with the Basic Authenticati
  ![image](https://user-images.githubusercontent.com/24970163/209461544-f8ec1cc1-2a69-4d4a-b4ec-58685e8f7ad3.png)
 
 Username - admin
+
 Password - admin 
 01.	Registering a drone
 
