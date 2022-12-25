@@ -18,7 +18,7 @@ import javax.validation.constraints.*;
 public class DroneRegisterDTO {
     @NotNull(message =" Serial Number must not be null")
     @NotBlank(message =" Serial Number must not be empty")
-    @Size(min=5,max=100,message="Serial number must not be greater than {value} characters")
+    @Size(max=100,message="Serial number must not be greater than {value} characters")
     @JsonProperty(required = true)
     private String droneSerialNumber;
 
