@@ -58,9 +58,8 @@ Pre-Requirements
         
 Main Steps to Build and Run the project
 
-01.	Clone the project through GitHub repo link
-          https://github.com/Dhanut/DroneService.git
-          Token - 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
+01.	Clone the project through GitHub repo link -> https://github.com/Dhanut/DroneService.git
+          
           
 02.	Go to the file directory where you have cloned and go inside the repo and right click on the pom.xml file and open with IntelliJ.
 
