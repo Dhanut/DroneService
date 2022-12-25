@@ -221,4 +221,7 @@ Response: -
  
 ![image](https://user-images.githubusercontent.com/24970163/209461646-c4ee72cf-3ee1-40f7-9e97-7f5980f8f5b7.png)
 
+###JUNIT coverage of the project
+
+![image](https://user-images.githubusercontent.com/24970163/209467381-b7b7f508-8b1b-41b2-b314-29c3fb59bfea.png)
 ##END
