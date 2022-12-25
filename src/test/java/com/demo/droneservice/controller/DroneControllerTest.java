@@ -4,6 +4,7 @@ import com.demo.droneservice.dto.request.DroneRegisterDTO;
 import com.demo.droneservice.dto.request.LoadDroneDTO;
 import com.demo.droneservice.dto.request.MedicationDTO;
 import com.demo.droneservice.dto.response.ResponseDTO;
+import com.demo.droneservice.exception.CustomBusinessException;
 import com.demo.droneservice.service.DroneServiceImpl;
 import com.demo.droneservice.util.DroneModel;
 import com.demo.droneservice.util.DroneState;
@@ -51,7 +52,7 @@ public class DroneControllerTest {
      }
 
     @Test
-    public void testLoadDroneWithMedication(){
+    public void testLoadDroneWithMedication() throws CustomBusinessException {
 
         List<MedicationDTO> mockMedicationList = new ArrayList<>();
         mockMedicationList.add(MedicationDTO.builder().medicationCode("1").medicationImage("xx").medicationName("xx").medicationWeight(1.5).build());
@@ -65,20 +66,20 @@ public class DroneControllerTest {
 
 
     @Test
-    public void testCheckLoadedMedications(){
+    public void testCheckLoadedMedications() throws CustomBusinessException {
 
         Mockito.when(droneService.checkLoadedMedications(ArgumentMatchers.anyString())).thenReturn(responseDTO);
         Assert.assertEquals(HttpStatus.OK,droneController.checkLoadedMedications("mockSerialNumber").getStatusCode());
      }
 
     @Test
-    public void testCheckAvailableDrones(){
+    public void testCheckAvailableDrones() throws CustomBusinessException {
         Mockito.when(droneService.checkAvailableDrones()).thenReturn(responseDTO);
         Assert.assertEquals(HttpStatus.OK,droneController.checkAvailableDrones().getStatusCode());
      }
 
     @Test
-    public void testCheckBatteryLevel(){
+    public void testCheckBatteryLevel() throws CustomBusinessException {
         Mockito.when(droneService.checkBatteryLevel(ArgumentMatchers.anyString())).thenReturn(responseDTO);
         Assert.assertEquals(HttpStatus.OK,droneController.checkBatteryLevel("mockSerialNumber").getStatusCode());
     }

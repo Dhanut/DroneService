@@ -3,6 +3,7 @@ package com.demo.droneservice.controller;
 import com.demo.droneservice.dto.request.DroneRegisterDTO;
 import com.demo.droneservice.dto.request.LoadDroneDTO;
 import com.demo.droneservice.dto.response.ResponseDTO;
+import com.demo.droneservice.exception.CustomBusinessException;
 import com.demo.droneservice.service.DroneServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class DroneController {
     @PostMapping(path="/load", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Loading a Drone with medication")
     public ResponseEntity<ResponseDTO> loadDroneWithMedication(
-            @Valid @NotNull @RequestBody LoadDroneDTO loadDroneRequest)  {
+            @Valid @NotNull @RequestBody LoadDroneDTO loadDroneRequest) throws CustomBusinessException {
         log.info("Starting DroneController -> loadDroneWithMedication");
         ResponseDTO response = droneService.loadDroneWithMedication(loadDroneRequest);
         log.info("Ending DroneController -> loadDroneWithMedication");
@@ -64,7 +65,7 @@ public class DroneController {
     @GetMapping(path="/check/medications/{serialNumber}", produces = "application/json")
     @Operation(summary = "Checking available medications for a given drone")
     public ResponseEntity<ResponseDTO> checkLoadedMedications(
-            @PathVariable("serialNumber")String serialNumber)  {
+            @PathVariable("serialNumber")String serialNumber) throws CustomBusinessException {
         log.info("Starting DroneController -> checkLoadedMedications");
         log.info("Serial Number :{}",serialNumber);
         ResponseDTO response = droneService.checkLoadedMedications(serialNumber);
@@ -79,7 +80,7 @@ public class DroneController {
      * **/
     @GetMapping(path="/check/available", produces = "application/json")
     @Operation(summary = "Checking available drones")
-    public ResponseEntity<ResponseDTO> checkAvailableDrones()  {
+    public ResponseEntity<ResponseDTO> checkAvailableDrones() throws CustomBusinessException {
         log.info("Starting DroneController -> checkAvailableDrones");
         ResponseDTO response = droneService.checkAvailableDrones();
         log.info("Ending DroneController -> checkAvailableDrones");
@@ -95,7 +96,7 @@ public class DroneController {
     @GetMapping(path="/check/batteryLevel/{serialNumber}", produces = "application/json")
     @Operation(summary = "Checking battery level for a given drone")
     public ResponseEntity<ResponseDTO> checkBatteryLevel(
-            @PathVariable("serialNumber")String serialNumber)  {
+            @PathVariable("serialNumber")String serialNumber) throws CustomBusinessException {
         log.info("Starting DroneController -> checkBatteryLevel");
         log.info("Serial Number :{}",serialNumber);
         ResponseDTO response = droneService.checkBatteryLevel(serialNumber);

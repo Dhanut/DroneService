@@ -3,6 +3,7 @@ package com.demo.droneservice.service;
 import com.demo.droneservice.dto.request.DroneRegisterDTO;
 import com.demo.droneservice.dto.request.LoadDroneDTO;
 import com.demo.droneservice.dto.request.MedicationDTO;
+import com.demo.droneservice.exception.CustomBusinessException;
 import com.demo.droneservice.modal.Drone;
 import com.demo.droneservice.modal.LoadDrone;
 import com.demo.droneservice.modal.Medication;
@@ -59,7 +60,7 @@ public class DroneServiceImplTest {
     }
 
     @Test
-    public void testLoadDroneWithMedication(){
+    public void testLoadDroneWithMedication() throws CustomBusinessException {
 
         List<MedicationDTO> mockMedicationList = new ArrayList<>();
         mockMedicationList.add(MedicationDTO.builder().medicationCode("1").medicationImage("xx").medicationName("xx").medicationWeight(1.5).build());
@@ -79,7 +80,7 @@ public class DroneServiceImplTest {
     }
 
     @Test
-    public void testLoadDroneWithMedicationWithNoData(){
+    public void testLoadDroneWithMedicationWithNoData() throws CustomBusinessException {
         List<MedicationDTO> mockMedicationList = new ArrayList<>();
         mockMedicationList.add(MedicationDTO.builder().medicationCode("1").medicationImage("xx").medicationName("xx").medicationWeight(50.00).build());
         mockMedicationList.add(MedicationDTO.builder().medicationCode("2").medicationImage("yy").medicationName("yy").medicationWeight(50.00).build());
@@ -97,8 +98,8 @@ public class DroneServiceImplTest {
         Assert.assertEquals("OK",droneService.loadDroneWithMedication(mockLoadDroneDTO).getStatus());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testLoadDroneWithMedicationWithValidationError() throws RuntimeException{
+    @Test(expected = CustomBusinessException.class)
+    public void testLoadDroneWithMedicationWithValidationError() throws CustomBusinessException {
         List<MedicationDTO> mockMedicationList = new ArrayList<>();
         mockMedicationList.add(MedicationDTO.builder().medicationCode("1").medicationImage("xx").medicationName("xx").medicationWeight(50.00).build());
         mockMedicationList.add(MedicationDTO.builder().medicationCode("2").medicationImage("yy").medicationName("yy").medicationWeight(50.00).build());
@@ -137,7 +138,7 @@ public class DroneServiceImplTest {
     }**/
 
    @Test
-   public void testCheckLoadedMedications(){
+   public void testCheckLoadedMedications() throws CustomBusinessException {
 
        List<Medication> mockMedicationList = new ArrayList<>();
        mockMedicationList.add(Medication.builder().medicationCode("1").medicationImage("xx").medicationName("xx").medicationWeight(1.5).build());
@@ -147,25 +148,45 @@ public class DroneServiceImplTest {
        loadDroneList.add(LoadDrone.builder().loadingMedicationList(mockMedicationList).loadingDeliveryAddress("address").loadingTotalQuantity(2).loadingDroneSerialNumber("1111").build());
        loadDroneList.add(LoadDrone.builder().loadingMedicationList(mockMedicationList).loadingDeliveryAddress("address").loadingTotalQuantity(2).loadingDroneSerialNumber("1111").build());
 
-       Mockito.when(loadDroneRepository.findByLoadingDroneSerialNumber(ArgumentMatchers.anyString())).thenReturn(Optional.of(loadDroneList));
+       Mockito.when(loadDroneRepository.findByLoadingDroneSerialNumber(ArgumentMatchers.anyString())).thenReturn(loadDroneList);
        Assert.assertEquals("OK",droneService.checkLoadedMedications("mockSerialNumber").getStatus());
    }
 
+    @Test(expected = CustomBusinessException.class)
+    public void testCheckLoadedMedicationsWithException() throws CustomBusinessException {
+        List<LoadDrone> loadDroneList = new ArrayList<>();
+        Mockito.when(loadDroneRepository.findByLoadingDroneSerialNumber(ArgumentMatchers.anyString())).thenReturn(loadDroneList);
+        Assert.assertEquals(HttpStatus.BAD_REQUEST,droneService.checkLoadedMedications("mockSerialNumber").getStatus());
+    }
     @Test
-    public void testCheckAvailableDrones(){
+    public void testCheckAvailableDrones() throws CustomBusinessException {
         List<Drone> droneList = new ArrayList<>();
         droneList.add(Drone.builder().droneState(IDLE).droneModel(LIGHTWEIGHT).droneWeight(100.00).droneBatteryCapacity(45).droneSerialNumber("1111111111").build());
         droneList.add(Drone.builder().droneState(IDLE).droneModel(LIGHTWEIGHT).droneWeight(200.00).droneBatteryCapacity(65).droneSerialNumber("2222222222").build());
-        Mockito.when(droneRepository.findAllByDroneStateIn(ArgumentMatchers.any())).thenReturn(Optional.of(droneList));
+        Mockito.when(droneRepository.findAllByDroneStateIn(ArgumentMatchers.any())).thenReturn(droneList);
         Assert.assertEquals("OK",droneService.checkAvailableDrones().getStatus());
     }
 
+    @Test(expected = CustomBusinessException.class)
+    public void testCheckAvailableDronesWithEmptyList() throws CustomBusinessException {
+        List<Drone> droneList = new ArrayList<>();
+        Mockito.when(droneRepository.findAllByDroneStateIn(ArgumentMatchers.any())).thenReturn(droneList);
+        Assert.assertEquals(HttpStatus.BAD_REQUEST,droneService.checkAvailableDrones().getStatus());
+    }
 
     @Test
-    public void testCheckBatteryLevel(){
+    public void testCheckBatteryLevel() throws CustomBusinessException {
         Drone mockDrone = new Drone("AB999000",LIGHTWEIGHT,200.00,45,IDLE);
         Mockito.when(droneRepository.findByDroneSerialNumber(ArgumentMatchers.anyString())).thenReturn(Optional.of(mockDrone));
         Assert.assertEquals("OK",droneService.checkBatteryLevel("xxxxxxxx").getStatus());
+
+    }
+
+    @Test(expected = CustomBusinessException.class)
+    public void testCheckBatteryLevelWithError() throws CustomBusinessException {
+        Drone mockDrone = new Drone("AB999000",LIGHTWEIGHT,200.00,45,IDLE);
+        Mockito.when(droneService.checkBatteryLevel(ArgumentMatchers.anyString())).thenThrow(new CustomBusinessException("MESSAGE"));
+        Assert.assertEquals("No data found in database",droneService.checkBatteryLevel("xxxxxxxx").getMessage());
 
     }
 }

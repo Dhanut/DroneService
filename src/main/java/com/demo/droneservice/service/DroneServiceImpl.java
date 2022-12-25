@@ -4,6 +4,7 @@ import com.demo.droneservice.dto.request.DroneRegisterDTO;
 import com.demo.droneservice.dto.request.LoadDroneDTO;
 import com.demo.droneservice.dto.request.MedicationDTO;
 import com.demo.droneservice.dto.response.ResponseDTO;
+import com.demo.droneservice.exception.CustomBusinessException;
 import com.demo.droneservice.modal.Drone;
 import com.demo.droneservice.modal.LoadDrone;
 import com.demo.droneservice.modal.Medication;
@@ -70,7 +71,7 @@ public class DroneServiceImpl implements DroneService{
      * Return - ResponseDTO
      * **/
     @Override
-    public ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest){
+    public ResponseDTO loadDroneWithMedication(LoadDroneDTO loadDroneRequest) throws CustomBusinessException {
         log.info("Starting DroneServiceImpl -> loadingDroneWithMedication");
 
         Optional<Drone> drone = droneRepository.findByDroneSerialNumber(loadDroneRequest.getLoadingDroneSerialNumber());
@@ -119,12 +120,12 @@ public class DroneServiceImpl implements DroneService{
                         .build();
             }else{
                 log.info("Preventing loading Drone with conditional checking");
-                throw  new RuntimeException(LOAD_DRONE_ERROR);
+                throw  new CustomBusinessException(LOAD_DRONE_ERROR);
             }
 
         }else{
                 log.info("No Drone found in the database");
-                throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+                throw new CustomBusinessException(NO_DATA_FOUND_IN_DB);
         }
         log.info("Response of loadDroneWithMedication: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> loadingDroneWithMedication");
@@ -137,19 +138,19 @@ public class DroneServiceImpl implements DroneService{
      * Return - ResponseDTO
      * **/
     @Override
-    public ResponseDTO checkLoadedMedications(String droneSerialNumber) {
+    public ResponseDTO checkLoadedMedications(String droneSerialNumber) throws CustomBusinessException {
         log.info("Starting DroneServiceImpl -> checkingLoadedMedications");
-        Optional<List<LoadDrone>> loadDrone = loadDroneRepository.findByLoadingDroneSerialNumber(droneSerialNumber);
-        if(loadDrone.isPresent()){
+        List<LoadDrone> loadDrone = loadDroneRepository.findByLoadingDroneSerialNumber(droneSerialNumber);
+        if(!loadDrone.isEmpty()){
             Set<Medication> set = new HashSet<>();
-            loadDrone.get().forEach(i -> i.getLoadingMedicationList().forEach(m -> set.add(m)));
+            loadDrone.forEach(i -> i.getLoadingMedicationList().forEach(set ::add));
             responseDTO= ResponseDTO.builder()
                     .status(OK)
                     .message(CHECKED_LOADED_MEDICATIONS_SUCCESSFULLY+droneSerialNumber)
                     .data(set)
                     .build();
         }else{
-            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+            throw new CustomBusinessException(NO_DATA_FOUND_IN_DB);
         }
         log.info("Response of checkLoadedMedications: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkingLoadedMedications");
@@ -161,21 +162,21 @@ public class DroneServiceImpl implements DroneService{
      * Return - ResponseDTO
      * **/
     @Override
-    public ResponseDTO checkAvailableDrones() {
+    public ResponseDTO checkAvailableDrones() throws CustomBusinessException {
         log.info("Starting DroneServiceImpl -> checkAvailableDrones");
         List<DroneState> stateList = new ArrayList<>();
         stateList.add(IDLE);
         stateList.add(LOADING);
 
-        Optional<List<Drone>>  drones = droneRepository.findAllByDroneStateIn(stateList);
-        if(drones.isPresent()){
+        List<Drone> drones = droneRepository.findAllByDroneStateIn(stateList);
+        if(!drones.isEmpty()){
             responseDTO= ResponseDTO.builder()
                     .status(OK)
                     .message(AVAILABLE_DRONES_FOR_LOADIND)
                     .data(drones)
                     .build();
         }else{
-            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+            throw new CustomBusinessException(NO_DATA_FOUND_IN_DB);
         }
         log.info("Response of checkAvailableDrones: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkAvailableDrones");
@@ -187,7 +188,7 @@ public class DroneServiceImpl implements DroneService{
      * Return - ResponseDTO
      * **/
     @Override
-    public ResponseDTO checkBatteryLevel(String droneSerialNumber) {
+    public ResponseDTO checkBatteryLevel(String droneSerialNumber) throws CustomBusinessException {
         log.info("Starting DroneServiceImpl -> checkBatteryLevel");
         Optional<Drone> drone = droneRepository.findByDroneSerialNumber(droneSerialNumber);
         if(drone.isPresent()){
@@ -197,7 +198,7 @@ public class DroneServiceImpl implements DroneService{
                     .data(drone.get().getDroneBatteryCapacity())
                     .build();
         }else{
-            throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+            throw new CustomBusinessException(NO_DATA_FOUND_IN_DB);
         }
         log.info("Response of checkBatteryLevel: {}",responseDTO);
         log.info("Ending DroneServiceImpl -> checkBatteryLevel");
@@ -208,12 +209,12 @@ public class DroneServiceImpl implements DroneService{
      * Calculate the total weight of medication items
      * Return - Total Weight
      * **/
-    private Double getTotalMedicationWeight(List<MedicationDTO> loadingMedicationList) {
+    private Double getTotalMedicationWeight(List<MedicationDTO> loadingMedicationList) throws CustomBusinessException {
         Double totalWeight=0.00;
         for(MedicationDTO medicationItem : loadingMedicationList){
             Optional<Medication> response = medicationRepository.findByMedicationCode(medicationItem.getMedicationCode());
             if(!response.isPresent()){
-                throw new RuntimeException(NO_DATA_FOUND_IN_DB);
+                throw new CustomBusinessException(NO_DATA_FOUND_IN_DB);
             }else{
                 totalWeight= totalWeight+medicationItem.getMedicationWeight();
             }

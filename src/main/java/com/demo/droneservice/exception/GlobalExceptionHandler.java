@@ -47,4 +47,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ResponseDTO(FAILED,exception.getMessage(),java.time.LocalDateTime.now()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Method to globally handle any Custom Business Exception
+     * **/
+    @ExceptionHandler(value = { CustomBusinessException.class })
+    public ResponseEntity<ResponseDTO> customBusinessException(CustomBusinessException customBusinessException) {
+
+        logger.error("Business Exception: {}", customBusinessException.getMessage());
+        return new ResponseEntity<>(new ResponseDTO(FAILED,customBusinessException.getMessage(),java.time.LocalDateTime.now()),
+                HttpStatus.BAD_REQUEST);
+    }
 }

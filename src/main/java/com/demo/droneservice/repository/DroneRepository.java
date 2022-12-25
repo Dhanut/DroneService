@@ -21,6 +21,6 @@ public interface DroneRepository extends JpaRepository<Drone,String> {
     /**
      * Find All Drones in the database using given list of states of drones
      * **/
-    Optional<List<Drone>> findAllByDroneStateIn(@Param("drone_state") Collection<DroneState> state);
+    List<Drone> findAllByDroneStateIn(@Param("drone_state") Collection<DroneState> state);
 
 }
