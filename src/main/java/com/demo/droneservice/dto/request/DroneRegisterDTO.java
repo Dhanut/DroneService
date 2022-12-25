@@ -34,7 +34,7 @@ public class DroneRegisterDTO {
     @JsonProperty(required = true)
     private Integer droneBatteryCapacity;
 
-    @NotNull(message =" Serial Number must not be null")
+    @NotNull(message =" State must not be null")
     @JsonProperty(required = true)
     private DroneState droneState;
 
