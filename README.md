@@ -94,7 +94,11 @@ Password - admin
 
 
 End Point - http://localhost:8888/api/demo/drone/register
+
+
 Method – POST
+
+
 Input - {
    	    "droneSerialNumber":"AB999000",
     "droneModel":"LIGHTWEIGHT",
@@ -127,7 +131,10 @@ Assumptions: -
 
 End Point - http://localhost:8888/api/demo/drone/load
 
+
 Method    – POST
+
+
 Input        -  {
     "loadingDroneSerialNumber":"TR222783",
     "loadingTotalQuantity":2,
@@ -159,7 +166,9 @@ Response: -
 03.	Checking loaded medications
 
 End Point - http://localhost:8888/api/demo/drone/check/medications/TR222783
+
 Method – GET
+
 Input - Path param – {drone_serial_number}
 
  ![image](https://user-images.githubusercontent.com/24970163/209461595-91d35cbe-6c9b-42a3-bc78-79fcced5d237.png)
@@ -175,7 +184,9 @@ Response: -
 Assumption: Drone can be available if it is in IDLE or LOADING state only.
 
 End Point - http://localhost:8888/api/demo/drone/check/available
+
 Method – GET
+
 Input - Path param – NA
 
 ![image](https://user-images.githubusercontent.com/24970163/209461612-da531e3f-d694-45d0-86ce-566e3f518136.png)
@@ -188,7 +199,9 @@ Response: -
 05.	Checking battery level of drones
 
 End Point - http://localhost:8888/api/demo/drone/check/batteryLevel/AB999000
+
 Method – GET
+
 Input - Path param – Path param – {drone_serial_number}
 
 ![image](https://user-images.githubusercontent.com/24970163/209461624-6248990c-e98f-4749-ac55-fb426452e6f1.png)
